@@ -15,14 +15,14 @@ class DB {
     public function isAuth() {
         if (!isset($_SESSION['user'])) {
             header("Location: login.php");
-            exit(); // Füge diese Zeile hinzu
+            exit();
         }
         $cookie = $_SESSION['user'];
         $result = $this->db->query("SELECT * FROM user WHERE cookie = '$cookie'");
-        if ($result->num_rows < 1) { // Verwende "num_rows" statt "affected_rows"
+        if ($result->num_rows < 1) {
             session_destroy();
             header("Location: login.php");
-            exit(); // Füge diese Zeile hinzu
+            exit();
         }
     }
 
