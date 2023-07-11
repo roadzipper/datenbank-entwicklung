@@ -4,13 +4,12 @@ session_start();
 include('classes/StaticHTML.class.php');
 include('classes/DB.class.php');
 
-
-$page = new StaticHTML();
 $dbc = new DB();
 $db = $dbc->getDatabaseConnection();
 $username = $dbc->whoisloggedin();
+$dbc->isAuth();
 
-print $dbc->isAuth();
+$page = new StaticHTML();
 
 print $page->head("Wilkommen!");
 print $page->navbar($username);
