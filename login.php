@@ -6,20 +6,23 @@ $page = new StaticHTML();
 $dbc = new DB();
 $db = $dbc->getDatabaseConnection();
 
+$error = false;
+
 if (isset($_POST["nutzer"])) {
     $nutzer = filter_input(INPUT_POST, 'nutzer', FILTER_SANITIZE_STRING);
     $passwort = filter_input(INPUT_POST, 'passwort', FILTER_SANITIZE_STRING);
     $stmt = "SELECT * FROM user WHERE username = '$nutzer' AND password = '$passwort'";
     $result = $db->query($stmt);
     if ($db->affected_rows > 0) {
-        //COOKIE SETZEN
+        // COOKIE SETZEN
         session_start();
         $secret = md5(mt_rand(1,999999));
         $stmt = "UPDATE user SET cookie = '$secret', lastlogin = NOW() WHERE username = '$nutzer'";
         $db->query($stmt);
         $_SESSION['user'] = $secret;
-        //WEITERLEITEN
+        // WEITERLEITEN
         header('Location: index.php');
+        exit();
     } else {
         $error = true;
         session_destroy();
