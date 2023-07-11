@@ -8,17 +8,25 @@ $page = new StaticHTML();
 $dbc = new DB();
 $db = $dbc->getDatabaseConnection();
 
-$pid = filter_input(INPUT_GET, 'pid', FILTER_VALIDATE_INT); // Filtern und Importieren der GET-Variablen pid als int
+$pid = filter_input(INPUT_GET, 'pid', FILTER_SANITIZE_INT);
 
 if ($pid) {
     // Beitrag anzeigen und Kommentare abrufen
     postAndComments($pid, $page, $db);
+    
+    // Formular zum Erstellen eines Beitrags anzeigen
+    echo '
+    <form method="post" action="read.php?pid=' . $pid . '">
+        <input type="text" name="title" placeholder="Titel" required>
+        <textarea name="content" placeholder="Inhalt" required></textarea>
+        <input type="submit" name="submit" value="Beitrag erstellen">
+    </form>';
 } else {
     // Fehlerbehandlung für ungültige oder fehlende pid
-    print "Ungültige oder fehlende Beitrag-ID.";
+    echo "Ungültige oder fehlende Beitrag-ID.";
 }
 
-print $page->foot();
+echo $page->foot();
 
 // Rekursive Funktion zur Anzeige von Beitrag und Kommentaren
 function postAndComments($pid, $page, $db) {
@@ -28,7 +36,7 @@ function postAndComments($pid, $page, $db) {
     $post = $result->fetch_assoc();
 
     // Beitrag anzeigen
-    print $page->post($post);
+    echo $page->post($post);
 
     // Kommentare abrufen
     $stmt = "SELECT * FROM comments WHERE belongsto = $pid";
@@ -36,14 +44,15 @@ function postAndComments($pid, $page, $db) {
 
     // Überprüfen, ob es Kommentare gibt
     if ($result->num_rows > 0) {
-        print '<ul class="uk-comment-list">';
+        echo '<ul class="uk-comment-list">';
         while ($comment = $result->fetch_assoc()) {
-            print '<li>';
-            print $page->comment($comment);
+            echo '<li>';
+            echo $page->comment($comment);
             // Rekursiver Aufruf für alle Kommentare dieses Kommentars
             postAndComments($comment['cid'], $page, $db);
-            print '</li>';
+            echo '</li>';
         }
-        print '</ul>';
+        echo '</ul>';
     }
 }
+?>
